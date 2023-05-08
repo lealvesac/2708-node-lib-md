@@ -1,26 +1,29 @@
 import fs from "fs";
 
-// import chalk from "chalk";
+function extractorLinks (texto) {
+    const regex = /\[([^[\]]*?)\]\((https?:\/\/[^\s#.].[^\s]*)\)/gm;
+    const capturas = [...texto.matchAll(regex)];
+    const resultados = capturas.map(captura => ({[captura[1]]: captura[2]}));
+    return resultados;
+}
 
 function caseErro(erro) {
     throw new Error(erro.code, "Erro na leitura do arquivo!");
 }
 
-function getFile(file) {
-    const encoding = "UTF-8";
-    fs.promises.readFile(file, encoding)
-    .then((texto) => console.log(texto))
-    .catch(caseErro);
+// async/wait
+
+async function getFile(file) {
+    try {
+        const encoding = "UTF-8";
+        const texto = await fs.promises.readFile(file, encoding);
+        console.log(extractorLinks(texto));
+    }
+    catch (erro) {
+        caseErro(erro);
+    }
 }
 
-// function getFile(file) {
-//     const encoding = "UTF-8";
-//     fs.readFile(file, encoding, (erro, texto) => {
-//         if(erro) {
-//             caseErro(erro);
-//         }
-//         console.log (texto);
-//     });
-// }
-
 getFile("./arquivos/texto.md")
+
+//  \[([^[\]]*?)\]\((https?:\/\/[^\s#.].[^\s]*)\)
